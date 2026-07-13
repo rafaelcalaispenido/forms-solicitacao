@@ -406,8 +406,11 @@ document.getElementById('mainForm').addEventListener('submit', async function(e)
 
     let submissionId = "";
     try {
-      const countRes = await fetch(SHEETDB_URL + "?limit=9999");
-      const rows = await countRes.json();
+      const [resE, resD] = await Promise.all([
+        fetch(SHEETDB_URL + "?limit=9999&sheet=eNotas"),
+        fetch(SHEETDB_URL + "?limit=9999&sheet=DG")
+      ]);
+      const rows = [...(await resE.json()), ...(await resD.json())];
       const year = new Date().getFullYear();
       const yearRows = rows.filter(r => (r["ID"]||"").startsWith(year + "_"));
       const maxN = yearRows.reduce((max, r) => { const n = parseInt((r["ID"]||"").split("_")[1]||"0"); return n > max ? n : max; }, 0);
